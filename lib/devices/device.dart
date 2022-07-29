@@ -28,7 +28,7 @@ class _DevicesState extends State<Devices> {
               children: [
                 Text(
                   'Time: ${DateTime.now().hour}:${DateTime.now().minute}',
-                  style: TextStyle(),
+                  style: const TextStyle(),
                 )
               ],
             ),
@@ -42,7 +42,7 @@ class _DevicesState extends State<Devices> {
               children: [
                 Text(
                     'Date: ${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}',
-                    style: TextStyle())
+                    style: const TextStyle())
               ],
             ),
           ),
@@ -112,7 +112,7 @@ class _DevicesState extends State<Devices> {
                     appearance: appearance01,
                     min: 0,
                     max: 5000,
-                    initialValue: isON ? 300 : 0,
+                    initialValue: isON ? 4000 : 0,
                   )
                 ],
               ),
@@ -137,8 +137,8 @@ class _DevicesState extends State<Devices> {
                   width: 2,
                 ),
                 textStyle: TextStyle(color: isON ? Colors.green : Colors.red),
-                fixedSize: Size(50, 70),
-                minimumSize: Size(70, 70),
+                fixedSize: const Size(50, 70),
+                minimumSize: const Size(70, 70),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(50),
                 ),

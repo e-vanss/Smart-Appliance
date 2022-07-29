@@ -1,10 +1,11 @@
 import 'package:evans/devices/device.dart';
 import 'package:evans/notifications/notification.dart';
+import 'package:evans/settings/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:sleek_circular_slider/sleek_circular_slider.dart';
 
 class Home extends StatefulWidget {
-  Home({Key? key}) : super(key: key);
+  const Home({Key? key}) : super(key: key);
 
   @override
   State<Home> createState() => _HomeState();
@@ -16,9 +17,11 @@ class _HomeState extends State<Home> {
       const CircularSliderAppearance();
 
   int _selectedIndex = 0;
+
   static const List<Widget> _widgetOptions = <Widget>[
     Devices(),
     Notifications(),
+    Settings(),
   ];
 
   void _onItemTapped(int index) {
@@ -46,11 +49,16 @@ class _HomeState extends State<Home> {
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home, color: Colors.black),
+            label: "Home",
+            backgroundColor: Colors.white,
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings, color: Colors.black),
             label: 'Settings',
             backgroundColor: Colors.white,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.search, color: Colors.black),
+            icon: Icon(Icons.notifications_active_outlined, color: Colors.black),
             label: "Notifications",
             backgroundColor: Colors.white,
           ),
