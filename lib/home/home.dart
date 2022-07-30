@@ -16,12 +16,12 @@ class _HomeState extends State<Home> {
   final CircularSliderAppearance appearance01 =
       const CircularSliderAppearance();
 
-  int _selectedIndex = 0;
+  int _selectedIndex = 1;
 
   static const List<Widget> _widgetOptions = <Widget>[
+    Settings(),
     Devices(),
     Notifications(),
-    Settings(),
   ];
 
   void _onItemTapped(int index) {
@@ -48,17 +48,17 @@ class _HomeState extends State<Home> {
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.home, color: Colors.black),
-            label: "Home",
-            backgroundColor: Colors.white,
-          ),
-          BottomNavigationBarItem(
             icon: Icon(Icons.settings, color: Colors.black),
             label: 'Settings',
             backgroundColor: Colors.white,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.notifications_active_outlined, color: Colors.black),
+            icon: Icon(Icons.home, color: Colors.black),
+            label: "Home",
+            backgroundColor: Colors.white,
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.notifications, color: Colors.black),
             label: "Notifications",
             backgroundColor: Colors.white,
           ),
