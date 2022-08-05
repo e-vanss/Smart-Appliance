@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:evans/devices/device.dart';
 import 'package:evans/notifications/notification.dart';
 import 'package:evans/settings/settings.dart';
@@ -12,7 +13,10 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  Dio dio = Dio();
+
   bool isON = false;
+
   final CircularSliderAppearance appearance01 =
       const CircularSliderAppearance();
 
@@ -24,11 +28,14 @@ class _HomeState extends State<Home> {
     Notifications(),
   ];
 
+
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
   }
+
+ 
 
   @override
   Widget build(BuildContext context) {
