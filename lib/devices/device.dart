@@ -20,7 +20,7 @@ class _DevicesState extends State<Devices> {
 
   Stream currentStream() async* {
     while (true) {
-      await Future.delayed(Duration(seconds: 1));
+      await Future.delayed(const Duration(milliseconds: 500));
       var response = await dio.get(
           'https://ny3.blynk.cloud/external/api/get?token=mrSUJjz1RNXeYlRQla__0fVCSCmHrf0t&v1');
       yield response;
@@ -29,7 +29,7 @@ class _DevicesState extends State<Devices> {
 
   Stream powerStream() async* {
     while (true) {
-      await Future.delayed(Duration(seconds: 1));
+      await Future.delayed(const Duration(milliseconds: 500));
       var response = await dio.get(
           'https://ny3.blynk.cloud/external/api/get?token=mrSUJjz1RNXeYlRQla__0fVCSCmHrf0t&v0');
       yield response;
@@ -38,9 +38,9 @@ class _DevicesState extends State<Devices> {
 
   Stream relayStream() async* {
     while (true) {
-      await Future.delayed(Duration(milliseconds: 500));
+      await Future.delayed(const Duration(milliseconds: 500));
       var response = await dio.get(
-          'https://ny3.blynk.cloud/external/api/get?token=mrSUJjz1RNXeYlRQla__0fVCSCmHrf0t&v0');
+          'https://ny3.blynk.cloud/external/api/get?token=mrSUJjz1RNXeYlRQla__0fVCSCmHrf0t&v5');
       yield response;
     }
   }
@@ -54,6 +54,15 @@ class _DevicesState extends State<Devices> {
     return await dio.get(
         'https://ny3.blynk.cloud/external/api/isHardwareConnected?token=mrSUJjz1RNXeYlRQla__0fVCSCmHrf0t');
   }
+
+  // Stream deviceStatus() async* {
+  //   while (true) {
+  //     await Future.delayed(const Duration(seconds: 1));
+  //     var response = await dio.get(
+  //         'https://ny3.blynk.cloud/external/api/isHardwareConnected?token=mrSUJjz1RNXeYlRQla__0fVCSCmHrf0t');
+  //     yield response;
+  //   }
+  // }
 
   Future relayStatus() async {
     var res = await dio.get(
@@ -75,13 +84,13 @@ class _DevicesState extends State<Devices> {
   @override
   void initState() {
     super.initState();
-    deviceStatus().then((response) {
-      if (response.statusCode == 200) {
-        setState(() {
-          isON = true;
-        });
-      }
-    });
+    // deviceStatus().then((response) {
+    //   if (response.statusCode == 200) {
+    //     setState(() {
+    //       isON = true;
+    //     });
+    //   }
+    // });
 
     relayStatus().then((response) {
       if (response.data == 1) {
@@ -101,25 +110,75 @@ class _DevicesState extends State<Devices> {
           const SizedBox(
             height: 100,
           ),
-          Center(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Row(
+
+          StreamBuilder(
+            stream: currentStream(),
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              if (snapshot.hasData) {
+                isON = snapshot.data.data == 1;
+
+                return Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            isON ? "Online " : "Offline ",
+                            style: const TextStyle(),
+                          ),
+                          Icon(
+                            Icons.online_prediction,
+                            color: isON ? Colors.green : Colors.red,
+                          )
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              }
+
+              return Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      isON ? "Online " : "Offline ",
-                      style: const TextStyle(),
+                    Row(
+                      children: const [
+                        Text(
+                          "Offline ",
+                          style: TextStyle(),
+                        ),
+                        Icon(
+                          Icons.online_prediction,
+                          color: Colors.red,
+                        )
+                      ],
                     ),
-                    Icon(
-                      Icons.online_prediction,
-                      color: isON ? Colors.green : Colors.red,
-                    )
                   ],
                 ),
-              ],
-            ),
+              );
+            },
           ),
+
+          // Center(
+          //   child: Row(
+          //     mainAxisAlignment: MainAxisAlignment.center,
+          //     children: [
+          //       Row(
+          //         children: [
+          //           Text(
+          //             isON ? "Online " : "Offline ",
+          //             style: const TextStyle(),
+          //           ),
+          //           Icon(
+          //             Icons.online_prediction,
+          //             color: isON ? Colors.green : Colors.red,
+          //           )
+          //         ],
+          //       ),
+          //     ],
+          //   ),
+          // ),
           const SizedBox(
             height: 20,
           ),
