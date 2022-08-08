@@ -202,10 +202,11 @@ class _DevicesState extends State<Devices> {
                   const SizedBox(
                     height: 20,
                   ),
+                  
                   StreamBuilder(
                     stream: currentStream(),
                     builder: (BuildContext context, AsyncSnapshot snapshot) {
-                      if (snapshot.hasData) {
+                      if (snapshot.hasData && isON) {
                         return SleekCircularSlider(
                           onChangeStart: (double value) {},
                           onChangeEnd: (double value) {},
@@ -271,7 +272,7 @@ class _DevicesState extends State<Devices> {
                   StreamBuilder(
                     stream: powerStream(),
                     builder: (BuildContext context, AsyncSnapshot snapshot) {
-                      if (snapshot.hasData) {
+                      if (snapshot.hasData && isON) {
                         // print(snapshot.data.data);
                         return SleekCircularSlider(
                           onChangeStart: (double value) {},
