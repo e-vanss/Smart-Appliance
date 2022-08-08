@@ -50,19 +50,19 @@ class _DevicesState extends State<Devices> {
         'https://ny3.blynk.cloud/external/api/update?token=mrSUJjz1RNXeYlRQla__0fVCSCmHrf0t&v5=${relayOn ? 0 : 1}');
   }
 
-  Future deviceStatus() async {
-    return await dio.get(
-        'https://ny3.blynk.cloud/external/api/isHardwareConnected?token=mrSUJjz1RNXeYlRQla__0fVCSCmHrf0t');
-  }
-
-  // Stream deviceStatus() async* {
-  //   while (true) {
-  //     await Future.delayed(const Duration(seconds: 1));
-  //     var response = await dio.get(
-  //         'https://ny3.blynk.cloud/external/api/isHardwareConnected?token=mrSUJjz1RNXeYlRQla__0fVCSCmHrf0t');
-  //     yield response;
-  //   }
+  // Future deviceStatus() async {
+  //   return await dio.get(
+  //       'https://ny3.blynk.cloud/external/api/isHardwareConnected?token=mrSUJjz1RNXeYlRQla__0fVCSCmHrf0t');
   // }
+
+  Stream deviceStatus() async* {
+    while (true) {
+      await Future.delayed(const Duration(seconds: 1));
+      var response = await dio.get(
+          'https://ny3.blynk.cloud/external/api/isHardwareConnected?token=mrSUJjz1RNXeYlRQla__0fVCSCmHrf0t');
+      yield response;
+    }
+  }
 
   Future relayStatus() async {
     var res = await dio.get(
@@ -112,10 +112,10 @@ class _DevicesState extends State<Devices> {
           ),
 
           StreamBuilder(
-            stream: currentStream(),
+            stream: deviceStatus(),
             builder: (BuildContext context, AsyncSnapshot snapshot) {
               if (snapshot.hasData) {
-                isON = snapshot.data.data == 1;
+                isON = snapshot.data!.data;
 
                 return Center(
                   child: Row(
