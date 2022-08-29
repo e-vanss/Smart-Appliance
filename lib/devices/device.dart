@@ -100,7 +100,7 @@ class _DevicesState extends State<Devices> {
       }
     });
   }
-
+ 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
