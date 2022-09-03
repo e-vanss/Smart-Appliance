@@ -100,7 +100,7 @@ class _DevicesState extends State<Devices> {
       }
     });
   }
- 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -202,7 +202,6 @@ class _DevicesState extends State<Devices> {
                   const SizedBox(
                     height: 20,
                   ),
-                  
                   StreamBuilder(
                     stream: currentStream(),
                     builder: (BuildContext context, AsyncSnapshot snapshot) {
