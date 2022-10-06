@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:sleek_circular_slider/sleek_circular_slider.dart';
@@ -16,6 +18,8 @@ class _DevicesState extends State<Devices> {
 
   bool isON = false;
   bool relayOn = false;
+
+  late Timer timer;
 
   final CircularSliderAppearance appearance01 =
       const CircularSliderAppearance();
@@ -85,6 +89,8 @@ class _DevicesState extends State<Devices> {
     }
   }
 
+  bool showNotif = false;
+
   @override
   void initState() {
     service = LocalNotificationService();
@@ -100,11 +106,37 @@ class _DevicesState extends State<Devices> {
     // });
 
     relayStatus().then((response) {
-      if (response.data == 1) {
+      if (response?.data == 1) {
         setState(() {
           relayOn = true;
         });
       }
+    });
+
+    _initializeTimer();
+
+    // if (showNotif) {
+    //   service.showScheduledNotification(
+    //     id: 0,
+    //     title: 'Smart Appliance Control',
+    //     body: 'Hey! Are you home?',
+    //     seconds: 4,
+    //   );
+    // }
+  }
+
+  void _initializeTimer() {
+    timer = Timer.periodic(const Duration(minutes: 1), (__) async {
+      if (showNotif) {
+        await service.showScheduledNotification(
+          id: 0,
+          title: 'Smart Appliance Control',
+          body: 'Hey! Are you home?',
+          seconds: 4,
+        );
+      }
+
+      // print("timer working");
     });
   }
 
@@ -279,6 +311,12 @@ class _DevicesState extends State<Devices> {
                     stream: powerStream(),
                     builder: (BuildContext context, AsyncSnapshot snapshot) {
                       if (snapshot.hasData && isON) {
+                        if (snapshot.data.data.toDouble() > 240) {
+                          showNotif = true;
+                        } else {
+                          showNotif = false;
+                        }
+
                         // print(snapshot.data.data);
                         return SleekCircularSlider(
                           onChangeStart: (double value) {},
@@ -371,40 +409,40 @@ class _DevicesState extends State<Devices> {
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 70),
-            child: ElevatedButton(
-              onPressed: () async {
-                await service.showScheduledNotification(
-                  id: 0,
-                  title: 'Smart Appliance Control',
-                  body: 'Hey! Are you home?',
-                  seconds: 4,
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                primary: Colors.white,
-                elevation: 0,
-                side: BorderSide(
-                  color: relayOn ? Colors.green : Colors.red,
-                  width: 2,
-                ),
-                textStyle:
-                    TextStyle(color: relayOn ? Colors.green : Colors.red),
-                fixedSize: const Size(50, 70),
-                minimumSize: const Size(70, 70),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(50),
-                ),
-              ),
-              child: Text(
-                relayOn ? 'Relay On' : 'Relay Off',
-                style: TextStyle(
-                  color: relayOn ? Colors.green : Colors.red,
-                ),
-              ),
-            ),
-          ),
+          // Padding(
+          //   padding: const EdgeInsets.symmetric(horizontal: 70),
+          //   child: ElevatedButton(
+          //     onPressed: () async {
+          //       await service.showScheduledNotification(
+          //         id: 0,
+          //         title: 'Smart Appliance Control',
+          //         body: 'Hey! Are you home?',
+          //         seconds: 4,
+          //       );
+          //     },
+          //     style: ElevatedButton.styleFrom(
+          //       primary: Colors.white,
+          //       elevation: 0,
+          //       side: BorderSide(
+          //         color: relayOn ? Colors.green : Colors.red,
+          //         width: 2,
+          //       ),
+          //       textStyle:
+          //           TextStyle(color: relayOn ? Colors.green : Colors.red),
+          //       fixedSize: const Size(50, 70),
+          //       minimumSize: const Size(70, 70),
+          //       shape: RoundedRectangleBorder(
+          //         borderRadius: BorderRadius.circular(50),
+          //       ),
+          //     ),
+          //     child: Text(
+          //       relayOn ? 'Relay On' : 'Relay Off',
+          //       style: TextStyle(
+          //         color: relayOn ? Colors.green : Colors.red,
+          //       ),
+          //     ),
+          //   ),
+          // ),
         ],
       ),
     );
