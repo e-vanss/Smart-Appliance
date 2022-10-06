@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:sleek_circular_slider/sleek_circular_slider.dart';
+import 'package:evans/services/local_notification_service.dart';
 
 class Devices extends StatefulWidget {
   const Devices({Key? key}) : super(key: key);
@@ -11,12 +12,15 @@ class Devices extends StatefulWidget {
 
 class _DevicesState extends State<Devices> {
   Dio dio = Dio();
+  late final LocalNotificationService service;
 
   bool isON = false;
   bool relayOn = false;
 
   final CircularSliderAppearance appearance01 =
       const CircularSliderAppearance();
+
+  // get service => null;
 
   Stream currentStream() async* {
     while (true) {
@@ -83,6 +87,9 @@ class _DevicesState extends State<Devices> {
 
   @override
   void initState() {
+    service = LocalNotificationService();
+    service.intialize();
+
     super.initState();
     // deviceStatus().then((response) {
     //   if (response.statusCode == 200) {
@@ -340,6 +347,40 @@ class _DevicesState extends State<Devices> {
               onPressed: () async {
                 await toggleDevice();
                 await relayStatus();
+              },
+              style: ElevatedButton.styleFrom(
+                primary: Colors.white,
+                elevation: 0,
+                side: BorderSide(
+                  color: relayOn ? Colors.green : Colors.red,
+                  width: 2,
+                ),
+                textStyle:
+                    TextStyle(color: relayOn ? Colors.green : Colors.red),
+                fixedSize: const Size(50, 70),
+                minimumSize: const Size(70, 70),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(50),
+                ),
+              ),
+              child: Text(
+                relayOn ? 'Relay On' : 'Relay Off',
+                style: TextStyle(
+                  color: relayOn ? Colors.green : Colors.red,
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 70),
+            child: ElevatedButton(
+              onPressed: () async {
+                await service.showScheduledNotification(
+                  id: 0,
+                  title: 'Smart Appliance Control',
+                  body: 'Hey! Are you home?',
+                  seconds: 4,
+                );
               },
               style: ElevatedButton.styleFrom(
                 primary: Colors.white,
