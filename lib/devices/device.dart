@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:async';
 
 import 'package:dio/dio.dart';
@@ -23,8 +25,6 @@ class _DevicesState extends State<Devices> {
 
   final CircularSliderAppearance appearance01 =
       const CircularSliderAppearance();
-
-  // get service => null;
 
   Stream currentStream() async* {
     while (true) {
@@ -57,11 +57,6 @@ class _DevicesState extends State<Devices> {
     await dio.get(
         'https://ny3.blynk.cloud/external/api/update?token=mrSUJjz1RNXeYlRQla__0fVCSCmHrf0t&v5=${relayOn ? 0 : 1}');
   }
-
-  // Future deviceStatus() async {
-  //   return await dio.get(
-  //       'https://ny3.blynk.cloud/external/api/isHardwareConnected?token=mrSUJjz1RNXeYlRQla__0fVCSCmHrf0t');
-  // }
 
   Stream deviceStatus() async* {
     while (true) {
@@ -97,13 +92,6 @@ class _DevicesState extends State<Devices> {
     service.intialize();
 
     super.initState();
-    // deviceStatus().then((response) {
-    //   if (response.statusCode == 200) {
-    //     setState(() {
-    //       isON = true;
-    //     });
-    //   }
-    // });
 
     relayStatus().then((response) {
       if (response?.data == 1) {
@@ -114,25 +102,16 @@ class _DevicesState extends State<Devices> {
     });
 
     _initializeTimer();
-
-    // if (showNotif) {
-    //   service.showScheduledNotification(
-    //     id: 0,
-    //     title: 'Smart Appliance Control',
-    //     body: 'Hey! Are you home?',
-    //     seconds: 4,
-    //   );
-    // }
   }
 
   void _initializeTimer() {
-    timer = Timer.periodic(const Duration(minutes: 1), (__) async {
+    timer = Timer.periodic(const Duration(seconds: 20), (__) async {
       if (showNotif) {
         await service.showScheduledNotification(
           id: 0,
           title: 'Smart Appliance Control',
-          body: 'Hey! Are you home?',
-          seconds: 4,
+          body: 'Power is being used at home now!',
+          seconds: 5,
         );
       }
 
@@ -149,7 +128,6 @@ class _DevicesState extends State<Devices> {
           const SizedBox(
             height: 100,
           ),
-
           StreamBuilder(
             stream: deviceStatus(),
             builder: (BuildContext context, AsyncSnapshot snapshot) {
@@ -198,39 +176,9 @@ class _DevicesState extends State<Devices> {
               );
             },
           ),
-
-          // Center(
-          //   child: Row(
-          //     mainAxisAlignment: MainAxisAlignment.center,
-          //     children: [
-          //       Row(
-          //         children: [
-          //           Text(
-          //             isON ? "Online " : "Offline ",
-          //             style: const TextStyle(),
-          //           ),
-          //           Icon(
-          //             Icons.online_prediction,
-          //             color: isON ? Colors.green : Colors.red,
-          //           )
-          //         ],
-          //       ),
-          //     ],
-          //   ),
-          // ),
           const SizedBox(
             height: 20,
           ),
-          // Center(
-          //   child: Row(
-          //     mainAxisAlignment: MainAxisAlignment.center,
-          //     children: [
-          //       Text(
-          //           'Date: ${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}',
-          //           style: const TextStyle())
-          //     ],
-          //   ),
-          // ),
           SizedBox(height: MediaQuery.of(context).size.height * 0.02),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -310,8 +258,10 @@ class _DevicesState extends State<Devices> {
                   StreamBuilder(
                     stream: powerStream(),
                     builder: (BuildContext context, AsyncSnapshot snapshot) {
+                      // print(snapshot.data.data);
+
                       if (snapshot.hasData && isON) {
-                        if (snapshot.data.data.toDouble() > 240) {
+                        if (snapshot.data.data.toDouble() > 50) {
                           showNotif = true;
                         } else {
                           showNotif = false;
@@ -379,70 +329,66 @@ class _DevicesState extends State<Devices> {
           const SizedBox(
             height: 20,
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 70),
-            child: ElevatedButton(
+          Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+            ElevatedButton(
               onPressed: () async {
                 await toggleDevice();
                 await relayStatus();
               },
               style: ElevatedButton.styleFrom(
-                primary: Colors.white,
+                backgroundColor: Colors.white,
                 elevation: 0,
                 side: BorderSide(
                   color: relayOn ? Colors.green : Colors.red,
                   width: 2,
                 ),
-                textStyle:
-                    TextStyle(color: relayOn ? Colors.green : Colors.red),
+                textStyle: TextStyle(
+                    color: relayOn
+                        ? Colors.green
+                        : const Color.fromARGB(255, 107, 102, 102)),
                 fixedSize: const Size(50, 70),
-                minimumSize: const Size(70, 70),
+                minimumSize: const Size(150, 50),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(50),
                 ),
               ),
               child: Text(
-                relayOn ? 'Relay On' : 'Relay Off',
+                relayOn ? 'Fridge On' : 'Fridge Off',
                 style: TextStyle(
                   color: relayOn ? Colors.green : Colors.red,
                 ),
               ),
             ),
-          ),
-          // Padding(
-          //   padding: const EdgeInsets.symmetric(horizontal: 70),
-          //   child: ElevatedButton(
-          //     onPressed: () async {
-          //       await service.showScheduledNotification(
-          //         id: 0,
-          //         title: 'Smart Appliance Control',
-          //         body: 'Hey! Are you home?',
-          //         seconds: 4,
-          //       );
-          //     },
-          //     style: ElevatedButton.styleFrom(
-          //       primary: Colors.white,
-          //       elevation: 0,
-          //       side: BorderSide(
-          //         color: relayOn ? Colors.green : Colors.red,
-          //         width: 2,
-          //       ),
-          //       textStyle:
-          //           TextStyle(color: relayOn ? Colors.green : Colors.red),
-          //       fixedSize: const Size(50, 70),
-          //       minimumSize: const Size(70, 70),
-          //       shape: RoundedRectangleBorder(
-          //         borderRadius: BorderRadius.circular(50),
-          //       ),
-          //     ),
-          //     child: Text(
-          //       relayOn ? 'Relay On' : 'Relay Off',
-          //       style: TextStyle(
-          //         color: relayOn ? Colors.green : Colors.red,
-          //       ),
-          //     ),
-          //   ),
-          // ),
+            ElevatedButton(
+              onPressed: () async {
+                await toggleDevice();
+                await relayStatus();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                elevation: 0,
+                side: BorderSide(
+                  color: relayOn ? Colors.green : Colors.red,
+                  width: 2,
+                ),
+                textStyle: TextStyle(
+                    color: relayOn
+                        ? Colors.green
+                        : const Color.fromARGB(255, 107, 102, 102)),
+                fixedSize: const Size(50, 70),
+                minimumSize: const Size(150, 50),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(50),
+                ),
+              ),
+              child: Text(
+                relayOn ? 'TV On' : 'TV Off',
+                style: TextStyle(
+                  color: relayOn ? Colors.green : Colors.red,
+                ),
+              ),
+            ),
+          ]),
         ],
       ),
     );
