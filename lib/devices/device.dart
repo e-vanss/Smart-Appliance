@@ -19,7 +19,8 @@ class _DevicesState extends State<Devices> {
   late final LocalNotificationService service;
 
   bool isON = false;
-  bool relayOn = false;
+  bool relay1On = true;
+  bool relay2On = true;
 
   late Timer timer;
 
@@ -44,7 +45,7 @@ class _DevicesState extends State<Devices> {
     }
   }
 
-  Stream relayStream() async* {
+  Stream relay1Stream() async* {
     while (true) {
       await Future.delayed(const Duration(milliseconds: 500));
       var response = await dio.get(
@@ -53,9 +54,20 @@ class _DevicesState extends State<Devices> {
     }
   }
 
+  Stream relay2Stream() async* {
+    while (true) {
+      await Future.delayed(const Duration(milliseconds: 500));
+      var response = await dio.get(
+          'https://ny3.blynk.cloud/external/api/get?token=mrSUJjz1RNXeYlRQla__0fVCSCmHrf0t&v4');
+      yield response;
+    }
+  }
+
   Future toggleDevice() async {
     await dio.get(
-        'https://ny3.blynk.cloud/external/api/update?token=mrSUJjz1RNXeYlRQla__0fVCSCmHrf0t&v5=${relayOn ? 0 : 1}');
+        'https://ny3.blynk.cloud/external/api/update?token=mrSUJjz1RNXeYlRQla__0fVCSCmHrf0t&v5=${relay1On ? 0 : 1}');
+    await dio.get(
+        'https://ny3.blynk.cloud/external/api/update?token=mrSUJjz1RNXeYlRQla__0fVCSCmHrf0t&v4=${relay2On ? 0 : 1}');
   }
 
   Stream deviceStatus() async* {
@@ -67,19 +79,36 @@ class _DevicesState extends State<Devices> {
     }
   }
 
-  Future relayStatus() async {
+  Future relay1Status() async {
     var res = await dio.get(
         'https://ny3.blynk.cloud/external/api/get?token=mrSUJjz1RNXeYlRQla__0fVCSCmHrf0t&v5');
 
-    print("relay: ${res.data}");
+    print("relay1: ${res.data}");
 
     if (res.data == 0) {
       setState(() {
-        relayOn = false;
+        relay1On = false;
       });
     } else {
       setState(() {
-        relayOn = true;
+        relay1On = true;
+      });
+    }
+  }
+
+  Future relay2Status() async {
+    var res = await dio.get(
+        'https://ny3.blynk.cloud/external/api/get?token=mrSUJjz1RNXeYlRQla__0fVCSCmHrf0t&v4');
+
+    print("relay2: ${res.data}");
+
+    if (res.data == 0) {
+      setState(() {
+        relay2On = false;
+      });
+    } else {
+      setState(() {
+        relay2On = true;
       });
     }
   }
@@ -93,10 +122,18 @@ class _DevicesState extends State<Devices> {
 
     super.initState();
 
-    relayStatus().then((response) {
+    relay1Status().then((response) {
       if (response?.data == 1) {
         setState(() {
-          relayOn = true;
+          relay1On = true;
+        });
+      }
+    });
+
+    relay2Status().then((response) {
+      if (response?.data == 1) {
+        setState(() {
+          relay2On = true;
         });
       }
     });
@@ -333,17 +370,17 @@ class _DevicesState extends State<Devices> {
             ElevatedButton(
               onPressed: () async {
                 await toggleDevice();
-                await relayStatus();
+                await relay1Status();
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
                 elevation: 0,
                 side: BorderSide(
-                  color: relayOn ? Colors.green : Colors.red,
+                  color: relay1On ? Colors.green : Colors.red,
                   width: 2,
                 ),
                 textStyle: TextStyle(
-                    color: relayOn
+                    color: relay1On
                         ? Colors.green
                         : const Color.fromARGB(255, 107, 102, 102)),
                 fixedSize: const Size(50, 70),
@@ -353,26 +390,26 @@ class _DevicesState extends State<Devices> {
                 ),
               ),
               child: Text(
-                relayOn ? 'Fridge On' : 'Fridge Off',
+                relay1On ? 'Fridge On' : 'Fridge Off',
                 style: TextStyle(
-                  color: relayOn ? Colors.green : Colors.red,
+                  color: relay1On ? Colors.green : Colors.red,
                 ),
               ),
             ),
             ElevatedButton(
               onPressed: () async {
                 await toggleDevice();
-                await relayStatus();
+                await relay2Status();
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
                 elevation: 0,
                 side: BorderSide(
-                  color: relayOn ? Colors.green : Colors.red,
+                  color: relay2On ? Colors.green : Colors.red,
                   width: 2,
                 ),
                 textStyle: TextStyle(
-                    color: relayOn
+                    color: relay2On
                         ? Colors.green
                         : const Color.fromARGB(255, 107, 102, 102)),
                 fixedSize: const Size(50, 70),
@@ -382,9 +419,9 @@ class _DevicesState extends State<Devices> {
                 ),
               ),
               child: Text(
-                relayOn ? 'TV On' : 'TV Off',
+                relay2On ? 'TV On' : 'TV Off',
                 style: TextStyle(
-                  color: relayOn ? Colors.green : Colors.red,
+                  color: relay2On ? Colors.green : Colors.red,
                 ),
               ),
             ),
